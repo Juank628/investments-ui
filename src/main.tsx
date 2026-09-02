@@ -8,7 +8,7 @@ import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MantineProvider>
+    <MantineProvider defaultColorScheme="light">
       <BrowserRouter>
         <App />
       </BrowserRouter>
