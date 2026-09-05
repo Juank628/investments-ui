@@ -10,8 +10,11 @@ import {
 } from '@mantine/core';
 
 import styles from './styles.module.css';
+import { useLogin } from './useLogin';
 
 const Login = () => {
+  const { loginCredentials, onCredentialsChange, errorMsg, isLoading, handleSignIn } = useLogin();
+
   return (
     <Center h="100vh" w="100%">
       <Container size={420} mb={100}>
@@ -22,15 +25,27 @@ const Login = () => {
         <Text className={styles.subtitle}>Please add your credentials</Text>
 
         <Paper w="400px" withBorder shadow="sm" p={22} mt={15} radius="md">
-          <TextInput label="Email" placeholder="you@mantine.dev" required radius="md" />
+          <TextInput
+            label="Email"
+            required
+            name="email"
+            value={loginCredentials.email}
+            onChange={onCredentialsChange}
+          />
           <PasswordInput
             label="Password"
-            placeholder="Your password"
             required
             mt="md"
-            radius="md"
+            name="password"
+            value={loginCredentials.password}
+            onChange={onCredentialsChange}
           />
-          <Button fullWidth mt="xl" radius="md">
+          {errorMsg && (
+            <Text c="red" size="sm" mt="md">
+              {errorMsg}
+            </Text>
+          )}
+          <Button fullWidth mt="sm" radius="md" loading={isLoading} onClick={handleSignIn}>
             Sign in
           </Button>
         </Paper>
