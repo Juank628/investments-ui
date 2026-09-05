@@ -70,8 +70,12 @@ without one.
 
 ### Files hold one kind of thing
 
-- `types.ts` — interfaces and types only, no functions
-- `src/services/helpers.ts` — shared, cross-endpoint helpers
+- `types.ts` — interfaces and types only, never functions.
+- `helpers.ts` — functions only, never `type` or `interface` declarations. A helper's types go in
+  the sibling `types.ts` and are imported from there.
+- Each layer keeps its own pair: a resource's request and response bodies live in
+  `src/services/endpoints/<resource>/types.ts`; types shared across endpoints go in
+  `src/services/types.ts` (create it when the first one is needed).
 
 ## API layer
 

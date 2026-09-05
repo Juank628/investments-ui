@@ -1,10 +1,6 @@
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import type { SerializedError } from '@reduxjs/toolkit';
 
-export interface IErrorResponseBody {
-  error?: string;
-}
-
 export const getErrorMessage = (error: FetchBaseQueryError | SerializedError): string => {
   if (
     'data' in error &&
