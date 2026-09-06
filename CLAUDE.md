@@ -68,6 +68,21 @@ narrowing (`'data' in error`, `typeof x === 'string'`) over asserting. If an ass
 required, verify it with a type-check first — spreads and computed keys usually infer correctly
 without one.
 
+### Interfaces are `I`-prefixed, type aliases are `T`-prefixed
+
+`interface` declarations start with `I` (`IMovement`, `ILoginRequestBody`); `type` alias unions
+start with `T` (`TBroker`, `TDayType`). This makes it obvious at the use site whether a name is an
+object shape or a union/alias.
+
+```ts
+export type TBroker = 'IBKR' | 'TASTY';
+
+export interface IMovement {
+  id: string;
+  broker: TBroker;
+}
+```
+
 ### Files hold one kind of thing
 
 - `types.ts` — interfaces and types only, never functions.
