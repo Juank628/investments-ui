@@ -6,6 +6,7 @@ import type { INavLink } from './types';
 
 const navLinks: INavLink[] = [
   { label: 'Home', path: '/' },
+  { label: 'Movements', path: '/movements' },
   { label: 'Vertical Spreads', path: '/vertical-spreads' },
 ];
 
