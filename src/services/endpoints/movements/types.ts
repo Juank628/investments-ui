@@ -13,6 +13,11 @@ export interface IMovement {
   updatedBy: string;
 }
 
+export interface IGetMovementsParams {
+  fromDate: string;
+  toDate: string;
+}
+
 export interface ICreateMovementRequestBody {
   dateTime: string;
   broker: TBroker;

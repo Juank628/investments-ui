@@ -1,10 +1,21 @@
 import { api } from '../../api';
-import type { IMovement, ICreateMovementRequestBody, IUpdateMovementRequestBody } from './types';
+import type {
+  IMovement,
+  IGetMovementsParams,
+  ICreateMovementRequestBody,
+  IUpdateMovementRequestBody,
+} from './types';
 
 export const movementsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getMovements: builder.query<IMovement[], void>({
-      query: () => '/movements',
+    // Without params the API returns the full history. Returning the plain url rather than
+    // `params: undefined` keeps that request free of a trailing '?'.
+    getMovements: builder.query<IMovement[], IGetMovementsParams | void>({
+      query: (params) => (params ? { url: '/movements', params } : '/movements'),
+      providesTags: ['Movement'],
+      // No caching: the entry is dropped as soon as nothing subscribes to it, so remounting the
+      // page or changing the selected months always refetches rather than showing a stale response.
+      keepUnusedDataFor: 0,
     }),
     getMovement: builder.query<IMovement, string>({
       query: (id) => `/movements/${id}`,
@@ -15,6 +26,7 @@ export const movementsApi = api.injectEndpoints({
         method: 'POST',
         body,
       }),
+      invalidatesTags: ['Movement'],
     }),
     updateMovement: builder.mutation<IMovement, { id: string; body: IUpdateMovementRequestBody }>({
       query: ({ id, body }) => ({

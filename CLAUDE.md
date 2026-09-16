@@ -27,39 +27,45 @@ src/pages/login/
 └── styles.module.css
 ```
 
-### One state per form, not one per field
+### Forms use `useForm` from `@mantine/form`
 
-Group form data in a single state object typed with the matching request body interface. Never
-create a `useState` per input.
+Never hand-roll form state with `useState` per field, and never hand-roll a shared
+`on<Group>Change` handler. Every form is a `useForm` call living in the page hook — the hook owns
+the form, the view only binds to it.
+
+Type the form with the matching request body interface, and put `validate` next to
+`initialValues` so the rules sit with the shape they guard.
 
 ```ts
-// Good
-const [loginCredentials, setLoginCredentials] = useState<ILoginRequestBody>({
-  email: '',
-  password: '',
+const form = useForm<ICreateMovementRequestBody>({
+  initialValues: { dateTime: '', broker: 'IBKR', amount: 0, description: '', userId: '' },
+  validate: {
+    description: (value) => (value.trim() ? null : 'Description is required'),
+  },
 });
-
-// Bad
-const [email, setEmail] = useState('');
-const [password, setPassword] = useState('');
 ```
 
-### Inputs carry a `name`, handled by a single `on<Group>Change`
-
-Every input sets `name` to its key in the form state, and all inputs in a group share one handler
-named after that group (`loginCredentials` → `onCredentialsChange`). The handler takes only the
-event and derives the field from `event.currentTarget.name`.
-
-```ts
-const onCredentialsChange = (event: ChangeEvent<HTMLInputElement>) => {
-  const { name, value } = event.currentTarget;
-  setLoginCredentials((prev) => ({ ...prev, [name]: value }));
-};
-```
+In the view, bind each input with `key={form.key('<field>')}` **and** spread
+`form.getInputProps('<field>')`. `useForm` runs uncontrolled by default; without the `key` a field
+will not re-render after `form.reset()`.
 
 ```tsx
-<TextInput name="email" value={loginCredentials.email} onChange={onCredentialsChange} />
+<TextInput
+  label="Description"
+  required
+  key={form.key('description')}
+  {...form.getInputProps('description')}
+/>
 ```
+
+Submit through `form.onSubmit(handler)` on a real `<form>` element, so validation runs before the
+handler and the submit button is a plain `type="submit"`.
+
+```tsx
+<form onSubmit={form.onSubmit(handleSaveMovement)}>
+```
+
+The hook returns `form` itself, alongside the submit handler and any server-side `errorMsg`.
 
 ### No unnecessary type assertions
 
@@ -105,5 +111,8 @@ export interface IMovement {
 
 ## UI
 
-Mantine components come from `@mantine/core`. The Mantine MCP server is configured in `.mcp.json` —
-use it to look up component props rather than guessing.
+Mantine components come from `@mantine/core`; date and month pickers come from `@mantine/dates`
+(its stylesheet is imported in `src/main.tsx`, after the core one). The Mantine MCP server is
+configured in `.mcp.json` — use it to look up component props rather than guessing.
+
+Keep every `@mantine/*` package on the same version — a skew across them breaks at runtime.
