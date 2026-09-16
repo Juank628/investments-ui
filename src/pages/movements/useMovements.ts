@@ -3,14 +3,23 @@ import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 
 import { skipToken } from '@reduxjs/toolkit/query/react';
+import type { ColDef, ValueFormatterParams } from 'ag-grid-community';
 
 import {
   useCreateMovementMutation,
   useGetMovementsQuery,
 } from '../../services/endpoints/movements';
-import type { ICreateMovementRequestBody } from '../../services/endpoints/movements/types';
+import type {
+  ICreateMovementRequestBody,
+  IMovement,
+} from '../../services/endpoints/movements/types';
 import { getErrorMessage } from '../../services/helpers';
-import { getCurrentMonthValue, getMonthsRange, pickerDateTimeToIso } from './helpers';
+import {
+  formatMovementDateTime,
+  getCurrentMonthValue,
+  getMonthsRange,
+  pickerDateTimeToIso,
+} from './helpers';
 import type { IBrokerOption, ISelectionModeOption, TMonthsRange, TSelectionMode } from './types';
 
 const brokerOptions: IBrokerOption[] = [
@@ -23,6 +32,30 @@ const selectionModeOptions: ISelectionModeOption[] = [
   { value: 'range', label: 'Range' },
   { value: 'month', label: 'Month' },
 ];
+
+const columnDefs: ColDef<IMovement>[] = [
+  // Ids are 36-character UUIDs; an equal flex share would truncate them.
+  { field: 'id', headerName: 'Id', minWidth: 290 },
+  {
+    field: 'dateTime',
+    headerName: 'Date and time',
+    // formatMovementDateTime throws on an invalid value, and the grid calls this for empty rows.
+    valueFormatter: (params: ValueFormatterParams<IMovement, string>) =>
+      params.value != null ? formatMovementDateTime(params.value) : '',
+  },
+  { field: 'broker', headerName: 'Broker' },
+  { field: 'amount', headerName: 'Amount' },
+  { field: 'description', headerName: 'Description' },
+  { field: 'userId', headerName: 'User email' },
+];
+
+const defaultColDef: ColDef<IMovement> = {
+  sortable: true,
+  resizable: true,
+  filter: true,
+  flex: 1,
+  minWidth: 100,
+};
 
 const initialMovement: ICreateMovementRequestBody = {
   dateTime: '',
@@ -97,6 +130,8 @@ export const useMovements = () => {
   return {
     brokerOptions,
     selectionModeOptions,
+    columnDefs,
+    defaultColDef,
     selectionMode,
     setSelectionMode,
     month,

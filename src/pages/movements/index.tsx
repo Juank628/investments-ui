@@ -8,14 +8,14 @@ import {
   SegmentedControl,
   Select,
   Stack,
-  Table,
   Text,
   TextInput,
   Title,
 } from '@mantine/core';
 import { DateTimePicker, MonthPickerInput } from '@mantine/dates';
+import { AgGridReact } from 'ag-grid-react';
 
-import { formatMovementDateTime } from './helpers';
+import type { IMovement } from '../../services/endpoints/movements/types';
 import styles from './styles.module.css';
 import { useMovements } from './useMovements';
 
@@ -23,6 +23,8 @@ const Movements = () => {
   const {
     brokerOptions,
     selectionModeOptions,
+    columnDefs,
+    defaultColDef,
     selectionMode,
     setSelectionMode,
     month,
@@ -91,37 +93,13 @@ const Movements = () => {
       )}
 
       {!isFetching && !loadErrorMsg && !isSelectionIncomplete && (
-        <Table.ScrollContainer minWidth={800}>
-          <Table striped highlightOnHover withTableBorder tabularNums>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Id</Table.Th>
-                <Table.Th>Date and time</Table.Th>
-                <Table.Th>Broker</Table.Th>
-                <Table.Th>Amount</Table.Th>
-                <Table.Th>Description</Table.Th>
-                <Table.Th>User email</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {movements.map((movement) => (
-                <Table.Tr key={movement.id}>
-                  <Table.Td>{movement.id}</Table.Td>
-                  <Table.Td>{formatMovementDateTime(movement.dateTime)}</Table.Td>
-                  <Table.Td>{movement.broker}</Table.Td>
-                  <Table.Td>{movement.amount}</Table.Td>
-                  <Table.Td>{movement.description}</Table.Td>
-                  <Table.Td>{movement.userId}</Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-          {movements.length === 0 && (
-            <Text c="dimmed" mt="sm">
-              No movements for the selected months.
-            </Text>
-          )}
-        </Table.ScrollContainer>
+        <div className={styles.grid}>
+          <AgGridReact<IMovement>
+            rowData={movements}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+          />
+        </div>
       )}
 
       <Modal opened={isDialogOpen} onClose={closeDialog} title="New movement">

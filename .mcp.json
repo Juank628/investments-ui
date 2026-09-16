@@ -3,6 +3,10 @@
     "mantine": {
       "command": "npx",
       "args": ["-y", "@mantine/mcp-server"]
+    },
+    "ag-mcp": {
+      "command": "npx",
+      "args": ["ag-mcp"]
     }
   }
 }

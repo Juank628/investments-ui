@@ -1,2 +1,8 @@
 .container {
 }
+
+/* AG Grid collapses to zero height without an explicitly sized container. */
+.grid {
+  height: 600px;
+  width: 100%;
+}
