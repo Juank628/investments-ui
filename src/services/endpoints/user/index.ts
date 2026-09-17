@@ -1,5 +1,5 @@
 import { api } from '../../api';
-import type { ILoginRequestBody, ILoginResponseBody } from './types';
+import type { ILoginRequestBody, ILoginResponseBody, TGetAllUsersResponseBody } from './types';
 
 export const userApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -10,7 +10,10 @@ export const userApi = api.injectEndpoints({
         body: credentials,
       }),
     }),
+    getAllUsers: builder.query<TGetAllUsersResponseBody, void>({
+      query: () => '/users-admin/list',
+    }),
   }),
 });
 
-export const { useLoginMutation } = userApi;
+export const { useLoginMutation, useGetAllUsersQuery } = userApi;

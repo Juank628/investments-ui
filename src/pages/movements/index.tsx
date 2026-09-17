@@ -39,6 +39,9 @@ const Movements = () => {
     closeDialog,
     handleNewMovement,
     form,
+    userOptions,
+    isFetchingUsers,
+    usersErrorMsg,
     errorMsg,
     isSaving,
     handleSaveMovement,
@@ -135,13 +138,21 @@ const Movements = () => {
               key={form.key('description')}
               {...form.getInputProps('description')}
             />
-            <TextInput
-              label="User email"
-              placeholder="user@example.com"
+            <Select
+              label="User"
+              placeholder={isFetchingUsers ? 'Loading users…' : 'Pick user'}
               required
+              searchable
+              data={userOptions}
+              disabled={isFetchingUsers}
               key={form.key('userId')}
               {...form.getInputProps('userId')}
             />
+            {usersErrorMsg && (
+              <Text c="red" size="sm">
+                {usersErrorMsg}
+              </Text>
+            )}
             {errorMsg && (
               <Text c="red" size="sm">
                 {errorMsg}

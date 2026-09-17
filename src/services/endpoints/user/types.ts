@@ -6,3 +6,5 @@ export interface ILoginRequestBody {
 export interface ILoginResponseBody {
   message: string;
 }
+
+export type TGetAllUsersResponseBody = string[];

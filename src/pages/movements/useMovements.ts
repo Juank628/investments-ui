@@ -13,6 +13,7 @@ import type {
   ICreateMovementRequestBody,
   IMovement,
 } from '../../services/endpoints/movements/types';
+import { useGetAllUsersQuery } from '../../services/endpoints/user';
 import { getErrorMessage } from '../../services/helpers';
 import {
   formatMovementDateTime,
@@ -90,6 +91,11 @@ export const useMovements = () => {
   // undefined means "fetch with no params" (all); skipToken means "do not fetch at all".
   const queryArg = selectionMode === 'all' ? undefined : (movementsParams ?? skipToken);
 
+  const {
+    data: userOptions = [],
+    isFetching: isFetchingUsers,
+    error: usersError,
+  } = useGetAllUsersQuery();
   const { data: movements = [], isFetching, error } = useGetMovementsQuery(queryArg);
   const [createMovement, { isLoading: isSaving }] = useCreateMovementMutation();
 
@@ -101,8 +107,7 @@ export const useMovements = () => {
       amount: (value) => (typeof value === 'number' ? null : 'Amount is required'),
       description: (value) => (value.trim() ? null : 'Description is required'),
       // userId is a foreign key onto User.email, so it holds an email address, not an id.
-      userId: (value) =>
-        /^\S+@\S+\.\S+$/.test(value.trim()) ? null : 'A valid user email is required',
+      userId: (value) => (value ? null : 'User is required'),
     },
   });
 
@@ -146,6 +151,9 @@ export const useMovements = () => {
     closeDialog,
     handleNewMovement,
     form,
+    userOptions,
+    isFetchingUsers,
+    usersErrorMsg: usersError ? getErrorMessage(usersError) : '',
     errorMsg,
     isSaving,
     handleSaveMovement,
